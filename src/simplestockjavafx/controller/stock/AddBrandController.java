@@ -7,7 +7,6 @@ package simplestockjavafx.controller.stock;
 
 //import BLL.BrandBLL;
 //import dataBase.DBConnection;
-
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Connection;
@@ -45,6 +44,7 @@ import simplestockjavafx.constants.ApplicationPath;
 import simplestockjavafx.resources.media.userNameMedia;
 import simplestockjavafx.service.ControlStockSvc;
 import simplestockjavafx.service.impl.ControlStockSvcImpl;
+import simplestockjavafx.utils.Alerts;
 import simplestockjavafx.utils.KeyValuePair;
 
 /**
@@ -70,10 +70,9 @@ public class AddBrandController implements Initializable {
     Connection con;
     PreparedStatement pst;
     ResultSet rs;
-    
+
 //    DBProperties dBProperties = new DBProperties();
 //    String db = dBProperties.loadPropertiesFile();
-
     @FXML
     public Button btnUpdate;
     @FXML
@@ -89,7 +88,7 @@ public class AddBrandController implements Initializable {
     private TextArea taDiscription;
     @FXML
     public Button btnAddBrand;
-    
+
     private ControlStockSvc controlStockSvc;
 
     public userNameMedia getMedia() {
@@ -106,24 +105,20 @@ public class AddBrandController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-         controlStockSvc = new ControlStockSvcImpl();
+        controlStockSvc = new ControlStockSvcImpl();
     }
 
     @FXML
     private void btnAddBrandOnAction(ActionEvent event) {
-        
+
         if (isNotNull()) {
             Brand brand = new Brand();
             brand.setBrandName(tfBrandName.getText());
             brand.setSupplyerId(cbSupplyer.getSelectionModel().getSelectedItem().getKey());
             brand.setBrandComment(taDiscription.getText());
             controlStockSvc.saveBrand(brand);
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("error");
-            alert.setHeaderText("Sucess : save sucess ");
-            alert.setContentText("brand added successfully");
-            alert.initStyle(StageStyle.UNDECORATED);
-            alert.showAndWait();
+            Alerts.showAlert(Alert.AlertType.INFORMATION, "error", "Sucess : save sucess", "brand added successfully");
+
         }
 
     }
@@ -149,7 +144,7 @@ public class AddBrandController implements Initializable {
 //            Logger.getLogger(AddBrandController.class.getName()).log(Level.SEVERE, null, ex);
 //        }
 //        
-         List<Supplyer> supplyerList = controlStockSvc.getSupplyerList();
+        List<Supplyer> supplyerList = controlStockSvc.getSupplyerList();
 
         for (Supplyer supplyer : supplyerList) {
             cbSupplyer.getItems().add(new KeyValuePair(supplyer.getId(), supplyer.getSupplyerName()));
@@ -185,16 +180,11 @@ public class AddBrandController implements Initializable {
         System.out.println(tfBrandName.getText());
         boolean isNotNull;
         if (tfBrandName.getText().trim().isEmpty()
-                || cbSupplyer.getSelectionModel().isEmpty()
-                && cbSupplyer.getPromptText().isEmpty()) {
+                  || cbSupplyer.getSelectionModel().isEmpty()
+                  && cbSupplyer.getPromptText().isEmpty()) {
             
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("error");
-            alert.setHeaderText("Error : null found ");
-            alert.setContentText("Please full all requre field");
-            alert.initStyle(StageStyle.UNDECORATED);
-            alert.showAndWait();
-            
+            Alerts.showAlert(Alert.AlertType.ERROR, "error", "Error : null found", "Please full all requre field");
+
             isNotNull = false;
 
         } else {

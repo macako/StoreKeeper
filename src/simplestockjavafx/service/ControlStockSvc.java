@@ -48,4 +48,8 @@ public interface ControlStockSvc {
 
     void updateSupplyer(Supplyer supplyer);
 
+    void deleteProduct(StoredProduct selectedItem);
+
+    List<StoredProduct> getStoredProductBySupplyerId(Integer supplyerId);
+
 }

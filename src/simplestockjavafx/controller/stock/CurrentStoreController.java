@@ -40,12 +40,14 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Optional;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 import simplestockjavafx.bo.StoredProduct;
+import simplestockjavafx.bo.Supplyer;
 import simplestockjavafx.bo.UserPermission;
 import simplestockjavafx.constants.ApplicationPath;
 import simplestockjavafx.resources.media.userNameMedia;
@@ -53,6 +55,7 @@ import simplestockjavafx.service.ControlStockSvc;
 import simplestockjavafx.service.LoginSvc;
 import simplestockjavafx.service.impl.ControlStockSvcImpl;
 import simplestockjavafx.service.impl.LoginSvcImpl;
+import simplestockjavafx.utils.KeyValuePair;
 
 /**
  * FXML Controller class
@@ -74,7 +77,7 @@ public class CurrentStoreController implements Initializable {
     @FXML
     private TextField tfSearch;
     @FXML
-    private ComboBox<String> cbSoteViewSupplyer;
+    private ComboBox<KeyValuePair> cbSoteViewSupplyer;
     @FXML
     private ComboBox<String> cbSoteViewBrands;
     @FXML
@@ -173,24 +176,18 @@ public class CurrentStoreController implements Initializable {
 
     @FXML
     private void cbSoteViewSupplyerOnClick(MouseEvent event) {
-//        con = dbCon.geConnection();
-//        cbSoteViewSupplyer.getItems().clear();
-//        cbSoteViewBrands.setPromptText("Select Brand");
-//        cbSoteViewCatagory.setPromptText("Select Category");
-//        try {
-//            pst = con.prepareStatement("select * from Supplyer");
-//            rs = pst.executeQuery();
-//            while (rs.next()) {
-//                cbSoteViewSupplyer.getItems().remove(rs.getString(2));
-//                cbSoteViewSupplyer.getItems().add(rs.getString(2));
-//            }
-//            rs.close();
-//            con.close();
-//            pst.close();
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
+        //   con = dbCon.geConnection();
+        cbSoteViewSupplyer.getItems().clear();
+        cbSoteViewSupplyer.getItems().removeAll();
+        cbSoteViewBrands.setPromptText("Select Brand");
+        cbSoteViewCatagory.setPromptText("Select Category");
 
+        List<Supplyer> supplyerList = controlStockSvc.getSupplyerList();
+
+        for (Supplyer supplyer : supplyerList) {
+            cbSoteViewSupplyer.getItems().add(new KeyValuePair(supplyer.getId(), supplyer.getSupplyerName()));
+        }
+    
     }
 
     @FXML
@@ -296,19 +293,17 @@ public class CurrentStoreController implements Initializable {
 
     @FXML
     private void btnDeleteOnAction(ActionEvent event) {
-//        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-//        alert.setTitle("Login Now");
-//        alert.setHeaderText("Confirm");
-//        alert.setContentText("Are you sure to delete this item \n to Confirm click ok");
-//        alert.initStyle(StageStyle.UNDECORATED);
-//        Optional<ButtonType> result = alert.showAndWait();
-//        if (result.isPresent() && result.get() == ButtonType.OK) {
-//            String item = tblViewCurrentStore.getSelectionModel().getSelectedItem().getId();
-//            System.out.println("Product id" + item);
-//            productCurrent.id = item;
-//            currentProductBLL.delete(productCurrent);
-//            btnRefreshOnACtion(event);
-//        }
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Login Now");
+        alert.setHeaderText("Confirm");
+        alert.setContentText("Are you sure to delete this item \n to Confirm click ok");
+        alert.initStyle(StageStyle.UNDECORATED);
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            StoredProduct product = tblViewCurrentStore.getSelectionModel().getSelectedItem();
+            controlStockSvc.deleteProduct(product);
+            btnRefreshOnACtion(event);
+        }
 
     }
 
@@ -346,7 +341,7 @@ public class CurrentStoreController implements Initializable {
         tblClmProductSellPrice.setCellValueFactory(new PropertyValueFactory<>("sellPrice"));
         tblClmProductRMA.setCellValueFactory(new PropertyValueFactory<>("rmaName"));
         tblClmProductAddBy.setCellValueFactory(new PropertyValueFactory<>("userName"));
-        tblClmProductdate.setCellValueFactory(new PropertyValueFactory<>("date"));
+        tblClmProductdate.setCellValueFactory(new PropertyValueFactory<>("createdOn"));
         currentStoredProductList.clear();
         currentStoredProductList.addAll(controlStockSvc.getStoredProductPagedList(10));
 
@@ -414,12 +409,13 @@ public class CurrentStoreController implements Initializable {
 
     @FXML
     private void cbSoteViewSupplyerOnAction(ActionEvent event) {
-        if (cbSoteViewSupplyer.getSelectionModel().getSelectedItem() == null) {
+        if (cbSoteViewSupplyer.getSelectionModel().getSelectedItem() != null) {
 
-        } else {
-            suplyerName = cbSoteViewSupplyer.getSelectionModel().getSelectedItem();
-//            productCurrent.supplierName = suplyerName;
-            //          currentProductGetway.searchBySupplyer(productCurrent);
+            suplyerName = cbSoteViewSupplyer.getSelectionModel().getSelectedItem().toString();
+            Integer supplyerId = cbSoteViewSupplyer.getSelectionModel().getSelectedItem().getKey();
+            currentStoredProductList.clear();
+            currentStoredProductList.addAll(controlStockSvc.getStoredProductBySupplyerId(supplyerId));
+
         }
 
     }
@@ -511,7 +507,7 @@ public class CurrentStoreController implements Initializable {
         tblClmProductSellPrice.setCellValueFactory(new PropertyValueFactory<>("sellPrice"));
         tblClmProductRMA.setCellValueFactory(new PropertyValueFactory<>("rma"));
         tblClmProductAddBy.setCellValueFactory(new PropertyValueFactory<>("user"));
-        tblClmProductdate.setCellValueFactory(new PropertyValueFactory<>("date"));
+        tblClmProductdate.setCellValueFactory(new PropertyValueFactory<>("createdOn"));
 //        currentProductGetway.view(productCurrent);
 
     }

@@ -122,4 +122,15 @@ public class ControlStockSvcImpl implements ControlStockSvc {
         brandDao.save(brand);
     }
 
+
+    @Override
+    public void deleteProduct(StoredProduct product) {
+        productDao.delete(product);
+    }
+
+    @Override
+    public List<StoredProduct> getStoredProductBySupplyerId(Integer supplyerId) {
+        return productDao.findByParameter(supplyerId);
+    }
+
 }

@@ -5,7 +5,6 @@
  */
 package simplestockjavafx.controller.stock;
 
-//import Getway.SupplyerGetway;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
@@ -18,14 +17,14 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
-//import DAL.Supplyer;
 import javafx.scene.control.Alert;
-import javafx.stage.StageStyle;
 import simplestockjavafx.bo.Supplyer;
 import simplestockjavafx.resources.media.userNameMedia;
 import simplestockjavafx.service.ControlStockSvc;
 import simplestockjavafx.service.impl.ControlStockSvcImpl;
+import simplestockjavafx.utils.Alerts;
 import simplestockjavafx.utils.EffectUtility;
+import simplestockjavafx.utils.Misc;
 
 /**
  * FXML Controller class
@@ -56,7 +55,6 @@ public class AddSupplyerController implements Initializable {
     @FXML
     public Label lblCaption;
 
-    private Stage primaryStage;
     @FXML
     private AnchorPane apContent;
 
@@ -71,7 +69,6 @@ public class AddSupplyerController implements Initializable {
         this.media = media;
     }
 
-//    SupplyerGetway supplyerGetway = new SupplyerGetway();
     /**
      * Initializes the controller class.
      *
@@ -85,69 +82,31 @@ public class AddSupplyerController implements Initializable {
 
     @FXML
     private void btnSaveOnAction(ActionEvent event) {
-        if (isNotNull()) {
-            Supplyer oSupplier = new Supplyer();
-            oSupplier.setSupplyerName(tfSupplyerName.getText());
-            oSupplier.setSupplyerContactNumber(taContactNumbers.getText());
-            oSupplier.setSupplyerAddress(taSupplyerAddress.getText());
-            oSupplier.setSupplyerDescription(taSupplyerDescription.getText());
-            oSupplier.setCreatedBy(usrId);
-            oSupplier.setUpdatedBy(usrId);
+       
+        Supplyer oSupplier = createSupplyer();
+        
+        if (oSupplier != null) {
             controlStockSvc.saveSupplyer(oSupplier);
-
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("error");
-            alert.setHeaderText("Sucess : save sucess ");
-            alert.setContentText("Supplayer added successfully");
-            alert.initStyle(StageStyle.UNDECORATED);
-            alert.showAndWait();
-
+            Alerts.showAlert(Alert.AlertType.INFORMATION, "error", "Sucess : save sucess", "Supplyer added successfully");
             clrAll();
         }
+
     }
-
-    public boolean isNotNull() {
-        boolean isNotNull;
-        if (tfSupplyerName.getText().trim().isEmpty()
-                  || tfSupplyerName.getText().trim().isEmpty()
-                  || taSupplyerAddress.getText().trim().isEmpty()
-                  || taSupplyerAddress.getText().trim().isEmpty()) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("error");
-            alert.setHeaderText("ERROR : NULL FOUND");
-            alert.setContentText("Please fill all require field");
-            alert.initStyle(StageStyle.UNDECORATED);
-            alert.showAndWait();
-
-            isNotNull = false;
-
-        } else {
-            isNotNull = true;
-        }
-        return isNotNull;
-    }
-
-    private void clrAll() {
-        tfSupplyerName.clear();
-        taContactNumbers.clear();
-        taSupplyerAddress.clear();
-        taSupplyerDescription.clear();
-    }
+    
 
     @FXML
     private void btnUpdateOnAction(ActionEvent event) {
-        if (isNotNull()) {
-            Supplyer oSupplier = new Supplyer();
-            oSupplier.setSupplyerName(tfSupplyerName.getText().trim());
-            oSupplier.setSupplyerContactNumber(taContactNumbers.getText().trim());
-            oSupplier.setSupplyerAddress(taSupplyerAddress.getText().trim());
-            oSupplier.setSupplyerDescription(taSupplyerDescription.getText().trim());
-            oSupplier.setUpdatedBy(usrId);
+        
+        Supplyer oSupplier = createSupplyer();
+        
+        if (oSupplier != null) {
             controlStockSvc.updateSupplyer(oSupplier);
+            Alerts.showAlert(Alert.AlertType.INFORMATION, "error", "Sucess : updated sucess", "Supplyer updated successfully");
+        }
+
 //            supplyerGetway.update(oSupplier);
 //            takeHistoy();
 //            tfSearchOnType(event);
-        }
     }
 
     @FXML
@@ -177,6 +136,31 @@ public class AddSupplyerController implements Initializable {
 
     public void addSupplyerStage(Stage stage) {
         EffectUtility.makeDraggable(stage, apContent);
+    }
+    
+    private Supplyer createSupplyer() {
+        
+        Supplyer oSupplier = null;
+
+        if (Misc.isNotNull(tfSupplyerName.getText(), tfSupplyerName.getText(), taSupplyerAddress.getText(), taSupplyerDescription.getText())) {
+            oSupplier = new Supplyer();
+            oSupplier.setSupplyerName(tfSupplyerName.getText().trim());
+            oSupplier.setSupplyerContactNumber(taContactNumbers.getText().trim());
+            oSupplier.setSupplyerAddress(taSupplyerAddress.getText().trim());
+            oSupplier.setSupplyerDescription(taSupplyerDescription.getText().trim());
+            oSupplier.setCreatedBy(usrId);
+            oSupplier.setUpdatedBy(usrId);
+
+        }
+
+        return oSupplier;
+    }
+
+    private void clrAll() {
+        tfSupplyerName.clear();
+        taContactNumbers.clear();
+        taSupplyerAddress.clear();
+        taSupplyerDescription.clear();
     }
 
 }

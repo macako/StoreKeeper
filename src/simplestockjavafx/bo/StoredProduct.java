@@ -11,7 +11,7 @@ import java.util.Date;
  *
  * @author macako
  */
-public class StoredProduct {
+public class StoredProduct extends ExtraInfo{
     
     private Integer id;
     private String productId;

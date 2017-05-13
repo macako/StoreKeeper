@@ -26,7 +26,6 @@ import org.apache.commons.dbutils.handlers.BeanListHandler;
 import org.apache.commons.dbutils.handlers.MapHandler;
 import org.apache.commons.dbutils.handlers.MapListHandler;
 import org.apache.commons.dbutils.handlers.ScalarHandler;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import simplestockjavafx.dao.GenericDAO;
 import simplestockjavafx.exceptions.DataBaseException;
@@ -57,86 +56,7 @@ public class GenericDAOJDBCImpl<T, Id extends Serializable> implements
     public List<T> findAll() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-
-
-    public List<T> findByQuery(String query, Class<T> clazz) {
-        Connection conexion = null;
-        Statement sentencia = null;
-        ResultSet filas = null;
-        ArrayList<T> listaDeObjetos = new ArrayList<T>();
-
-        try {
-
-            conexion = JDBCSqliteHelper.getConnector();
-  
-            sentencia = conexion.createStatement();
-
-            filas = sentencia.executeQuery(query);
-
-            while (filas.next()) {
-
-                T objeto = (T) clazz.newInstance();
-
-                for (int column = 1; column <= filas.getMetaData().getColumnCount(); column++) {
-
-                    String columnName = filas.getMetaData().getColumnName(column);
-                    Class columnClassType = objeto.getClass().getDeclaredField(columnName).getType();
-                    String columnType = columnClassType.getName();
-                    String method = "set" + StringUtils.capitalize(columnName);
-                    Method metodo = objeto.getClass().getMethod(method, columnClassType);
-
-                    if (columnType.contains("String")) {
-                        metodo.invoke(
-                                  objeto,
-                                  filas.getString(columnName));
-                    } else if (columnType.contains("Integer")) {
-                        metodo.invoke(
-                                  objeto,
-                                  filas.getInt(columnName));
-                    } else if (columnType.contains("BigDecimal")) {
-                        metodo.invoke(
-                                  objeto,
-                                  filas.getBigDecimal(columnName));
-                    } else {
-
-                    }
-                }
-
-                listaDeObjetos.add(objeto);
-            }
-        } catch (NoSuchMethodException e) {
-            LOG.error("Method set not found" + e.getMessage());
-            throw new DataBaseException("Method set not found", e);
-        } catch (NoSuchFieldException e) {
-            LOG.error("field not found" + e.getMessage());
-            throw new DataBaseException("ield not found", e);
-        } catch (SecurityException e) {
-            LOG.error("Error de seguridad" + e.getMessage());
-            throw new DataBaseException("Error de seguridad", e);
-        } catch (IllegalArgumentException e) {
-            LOG.error("Error en el tipo de argumentos" + e.getMessage());
-            throw new DataBaseException("Error en el tipo de argumentos", e);
-
-        } catch (SQLException e) {
-            LOG.error("Error de SQL" + e.getMessage());
-
-            throw new DataBaseException("Error de SQL", e);
-        } catch (InstantiationException e) {
-            LOG.error("Error de instanciacion" + e.getMessage());
-            throw new DataBaseException("Error de Instanciacion", e);
-
-        } catch (IllegalAccessException e) {
-            LOG.error("Error de acceso" + e.getMessage());
-            throw new DataBaseException("Error de acceso", e);
-        } catch (InvocationTargetException e) {
-            LOG.error("Error de invocacion" + e.getMessage());
-            throw new DataBaseException("Error de Invocacion", e);
-
-        }
-
-        return listaDeObjetos;
-
-    }
+    
 
     public int executeSql(String query) {
         Connection conexion = null;
@@ -247,6 +167,7 @@ public class GenericDAOJDBCImpl<T, Id extends Serializable> implements
         Connection conn = null; 
         try { 
             conn = JDBCSqliteHelper.getConnector();//dataSource.getConnection(); 
+            conn.setAutoCommit(false);
             if (params == null) { 
                 affectedRows = queryRunner.update(conn, sql); 
             } else { 

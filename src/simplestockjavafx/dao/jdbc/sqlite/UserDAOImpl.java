@@ -17,8 +17,8 @@ import simplestockjavafx.dao.UserDAO;
  * @author macako
  */
 public class UserDAOImpl extends GenericDAOJDBCImpl<Users, Integer> implements UserDAO {
-    
-      private static final Logger LOG = Logger.getLogger(UserDAOImpl.class
+
+    private static final Logger LOG = Logger.getLogger(UserDAOImpl.class
               .getPackage().getName());
 
     @Override
@@ -29,11 +29,13 @@ public class UserDAOImpl extends GenericDAOJDBCImpl<Users, Integer> implements U
 
     @Override
     public boolean isLogin(String sso, String pwd) {
-        String consultaSQL = "SELECT USER_SEQ_ID id, USER_NAME userName FROM T_USER WHERE USER_NAME = '" + sso + "' AND PASSWORD = '" + pwd + "' AND IS_ACTIVE='Y'";
+        String sql = "SELECT USER_SEQ_ID id, USER_NAME userName FROM T_USER WHERE USER_NAME = ? AND PASSWORD = ? AND IS_ACTIVE='Y'";
 
-        List<Users> users = findByQuery(consultaSQL, Users.class);
+        Object[] params = {sso, pwd};
 
-        return !users.isEmpty();
+        Users user = findFirst(Users.class, sql, params);
+
+        return user != null;
 
     }
 
@@ -52,7 +54,7 @@ public class UserDAOImpl extends GenericDAOJDBCImpl<Users, Integer> implements U
     @Override
     public void createAdminUser() {
         String sql = "SELECT USER_SEQ_ID FROM T_USER WHERE USER_NAME = 'admin'";
-        
+
         int count = getCount(sql);
 
         if (count == 0) {
@@ -60,7 +62,7 @@ public class UserDAOImpl extends GenericDAOJDBCImpl<Users, Integer> implements U
                 sql = "INSERT INTO T_USER (USER_NAME, PASSWORD, IS_ACTIVE, SSO) VALUES('admin','admin','Y', '111111111');";
                 insert(sql);
             } catch (SQLException ex) {
-               LOG.error("Can not create the admin user", ex);
+                LOG.error("Can not create the admin user", ex);
             }
         }
 

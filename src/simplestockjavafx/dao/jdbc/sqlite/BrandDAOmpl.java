@@ -5,7 +5,10 @@
  */
 package simplestockjavafx.dao.jdbc.sqlite;
 
+import java.sql.SQLException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import simplestockjavafx.bo.Brand;
 import simplestockjavafx.dao.BrandDAO;
 
@@ -29,5 +32,22 @@ public class BrandDAOmpl extends GenericDAOJDBCImpl<Brand, Integer> implements B
 
         return brands;
     }
+
+    @Override
+    public void save(Brand objeto) {
+        try {
+            String sql = "INSERT INTO T_BRAND (BRAND_NAME, BRAND_DESCRIPTION, SUPPLYER_SEQ_ID)"
+                      + " VALUES (?,?,?)";
+
+            Object[] params = {objeto.getBrandName(), objeto.getBrandComment(), objeto.getSupplyerId()};
+
+            insert(sql, params);
+
+        } catch (SQLException ex) {
+            Logger.getLogger(BrandDAOmpl.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    
 
 }

@@ -119,7 +119,7 @@ public class StockController implements Initializable {
     @FXML
     public void btnStockOnAction(ActionEvent event) throws IOException {
         lblHeader.setText("Store");
-        //CurrentStoreController asc = new CurrentStoreController();
+        CurrentStoreController asc = new CurrentStoreController();
         userNameMedia media = new userNameMedia();
         FXMLLoader fXMLLoader = new FXMLLoader();
         fXMLLoader.load(getClass().getResource(ApplicationPath.VIEW_FXML + "/stock/CurrentStore.fxml").openStream());
